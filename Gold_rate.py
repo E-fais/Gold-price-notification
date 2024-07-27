@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import requests
 from tkinter import messagebox
 import pandas as pd
-
+from plyer import notification
 root=ttk.Window(themename='solar')
 root.iconbitmap('icon.ico')
 root.title('F-RateGold')
@@ -39,7 +39,9 @@ def fetch_rate():
 
        date_label.config(text=update_time)
        gram_rate_label.config(text=f'One gram : ₹{price}')
-
+       
+       if price<=6300:
+           send_notification(price)
 
        old_rates_table=soup.findAll('tbody',class_='ranges')
       
@@ -53,6 +55,7 @@ def fetch_rate():
              old_rate_dict['rates'].append(old_rate)
        df=pd.DataFrame(old_rate_dict)  
        df.to_csv('gold_rates.csv',index=False) 
+       
      else:
        messagebox.showerror('Network Error','Cannot connect to server try again later')
     except Exception as err: 
@@ -90,11 +93,14 @@ def get_old_rates():
     back_btn.grid(row=back_btn_row,column=0,columnspan=2,)
 
 
-
-
-
-
-
+#notification
+def send_notification(price):
+   notification.notify(
+        title='Gold Rate Update',
+        message=f"Today's gold rate is {price} for gram.",
+        timeout=20  # Duration in seconds
+    )
+#UI Eelments
 header_label=ttk.Label(frame,text="F-RateGold",bootstyle='info',font=('helvetica',18))
 date_label=ttk.Label(frame,text='loading rate...',font=('helvetice',10))
 gram_rate_label=ttk.Label(frame,text=f'One gram : ₹',bootstyle='primary',font=('helvetica',18),padding=(5,10))
